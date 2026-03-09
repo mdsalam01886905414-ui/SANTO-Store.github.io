@@ -1,0 +1,32 @@
+[
+    {
+        "name": "DNS Changer Pro",
+        "developer": "Developer Name",
+        "description": "দ্রুত ও সুরক্ষিত DNS পরিবর্তন করুন। ইন্টারনেট স্পিড বাড়ান।",
+        "size": "5 MB",
+        "version": "1.0",
+        "rating": 5,
+        "icon": "🌐",
+        "apk": "dns_changer_pro.apk"
+    },
+    {
+        "name": "Telegram",
+        "developer": "Telegram LLC",
+        "description": "দ্রুত ও সুরক্ষিত মেসেজিং অ্যাপ।",
+        "size": "30 MB",
+        "version": "10.0",
+        "rating": 5,
+        "icon": "💬",
+        "apk": "telegram.apk"
+    },
+    {
+        "name": "Video Downloader",
+        "developer": "Tools Inc",
+        "description": "যেকোনো ভিডিও সহজে ডাউনলোড করুন।",
+        "size": "12 MB",
+        "version": "2.5",
+        "rating": 4,
+        "icon": "📥",
+        "apk": "video_downloader.apk"
+    }
+]

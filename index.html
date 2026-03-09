@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My App Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 50px;
+            padding: 15px 25px;
+            margin: 20px 0 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .search-bar input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .app-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        .app-info h3 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .app-info span {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .app-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .app-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .app-meta span {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .stars {
+            color: #ffc107;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .download-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: white;
+            opacity: 0.8;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 50px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+            padding: 30px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📱 My App Store</h1>
+            <p>আপনার প্রিয় অ্যাপস ডাউনলোড করুন</p>
+        </header>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 অ্যাপ খুঁজুন..." onkeyup="searchApps()">
+        </div>
+
+        <div class="loading" id="loading">⏳ অ্যাপস লোড হচ্ছে...</div>
+        <div class="no-results" id="noResults">😕 কোনো অ্যাপ পাওয়া যায়নি</div>
+
+        <div class="apps-grid" id="appsGrid"></div>
+
+        <footer>
+            <p>© 2025 My App Store | All Rights Reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        let allApps = [];
+
+        // Page load এ apps.json থেকে data নিয়ে আসবে
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApps();
+        });
+
+        // Apps লোড করার function
+        async function loadApps() {
+            try {
+                const response = await fetch('apps.json');
+                allApps = await response.json();
+                displayApps(allApps);
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                document.getElementById('loading').innerHTML = '❌ অ্যাপস লোড করতে সমস্যা হয়েছে';
+                console.error('Error loading apps:', error);
+            }
+        }
+
+        // Apps দেখানোর function
+        function displayApps(apps) {
+            const grid = document.getElementById('appsGrid');
+            grid.innerHTML = '';
+
+            if (apps.length === 0) {
+                document.getElementById('noResults').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('noResults').style.display = 'none';
+
+            apps.forEach(app => {
+                const stars = '⭐'.repeat(app.rating);
+                
+                // Icon হতে পারে emoji অথবা image URL
+                let iconHTML;
+                if (app.icon.startsWith('http') || app.icon.endsWith('.png') || app.icon.endsWith('.jpg')) {
+                    iconHTML = `<img src="${app.icon}" alt="${app.name}">`;
+                } else {
+                    iconHTML = app.icon;
+                }
+
+                const card = `
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">${iconHTML}</div>
+                            <div class="app-info">
+                                <h3>${app.name}</h3>
+                                <span>${app.developer}</span>
+                            </div>
+                        </div>
+                        <p class="app-description">${app.description}</p>
+                        <div class="app-meta">
+                            <span class="stars">${stars}</span>
+                            <span>📦 ${app.size}</span>
+                            <span>v${app.version}</span>
+                        </div>
+                        <a href="${app.apk}" download class="download-btn">⬇️ ডাউনলোড করুন</a>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        // Search function
+        function searchApps() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allApps.filter(app => 
+                app.name.toLowerCase().includes(input) ||
+                app.developer.toLowerCase().includes(input) ||
+                app.description.toLowerCase().includes(input)
+            );
+            displayApps(filtered);
+        }
+    </script>
+</body>
+  </html>
